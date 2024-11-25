@@ -76,51 +76,59 @@ exports.postUserProfile1 = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
+
 exports.getCost = async (req, res) => {
-    try {
-      const costData = await ConstructionCost.findOne();
-      console.log(costData);
+  try {
+    const userId = req.user.id; // Logged-in user ID from `protect` middleware
+    const costData = await ConstructionCost.findOne({ user: userId });
+
+    if (!costData) {
+      return res.status(404).json({ message: 'No cost data found for this user' });
+    }
+
+    return res.status(200).json({
+      foundation: costData.foundation,
+      painting: costData.painting,
+      lastUpdated: costData.updatedAt || 'Not available', // Use updatedAt
+    });
+  } catch (err) {
+    return res.status(500).json({ message: 'Error retrieving data', error: err.message });
+  }
+};
+
   
-      // If the costData exists and contains the updatedAt field, return it
+exports.updateCost = async (req, res) => {
+  try {
+    const userId = req.user.id; // Logged-in user ID from `protect` middleware
+    let costData = await ConstructionCost.findOne({ user: userId });
+
+    if (costData) {
+      // Update existing data
+      costData.foundation = req.body.foundation || costData.foundation;
+      costData.painting = req.body.painting || costData.painting;
+      await costData.save();
+
       return res.status(200).json({
-        foundation: costData.foundation,
-        painting: costData.painting,
-        lastUpdated: costData.updatedAt || "Not available",  // Use updatedAt here
+        message: 'Data updated successfully',
+        data: costData,
+        lastUpdated: costData.updatedAt || 'Not available', // Include updatedAt
       });
-    } catch (err) {
-      return res.status(500).json({ message: 'Error retrieving data', error: err.message });
+    } else {
+      // Create new data
+      costData = new ConstructionCost({
+        user: userId,
+        foundation: req.body.foundation,
+        painting: req.body.painting,
+      });
+      await costData.save();
+
+      return res.status(201).json({
+        message: 'Data created successfully',
+        data: costData,
+        lastUpdated: costData.updatedAt || 'Not available', // Include updatedAt
+      });
     }
-  };
-  
-  exports.updateCost = async (req, res) => {
-    try {
-      let costData = await ConstructionCost.findOne();
-      console.log(costData);
-  
-      if (costData) {
-        // Update existing data
-        costData.foundation = req.body.foundation;
-        costData.painting = req.body.painting;
-        await costData.save();
-        // Include updatedAt in the response
-        res.json({
-          message: 'Data updated successfully',
-          data: costData,
-          lastUpdated: costData.updatedAt || "Not available" // Include lastUpdated
-        });
-      } else {
-        // Create new data
-        costData = new ConstructionCost(req.body);
-        await costData.save();
-        // Include updatedAt in the response for the newly created document
-        res.json({
-          message: 'Data created successfully',
-          data: costData,
-          lastUpdated: costData.updatedAt || "Not available" // Include lastUpdated
-        });
-      }
-    } catch (err) {
-      res.status(500).json({ message: 'Error saving data', error: err.message });
-    }
-  };
-  
+  } catch (err) {
+    return res.status(500).json({ message: 'Error saving data', error: err.message });
+  }
+};

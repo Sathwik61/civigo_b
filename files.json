@@ -1,0 +1,43 @@
+{   
+    "pid": 1,
+    "projectname": "Project Name",
+    "createddate": "2021-01-01",
+    "clientname": "Client Name",
+    "clientaddress": "Client Address",
+    "clientcontact": "Client Contact",
+    "works": {
+        "foundation": {
+            "earthwork": {
+                "length": 0,
+                "breadth": 0,
+                "depth": 0,
+                "totalvalue": 0
+            },
+            "bedconcrete": {
+                "length": 0,
+                "breadth": 0,
+                "depth": 0,
+                "totalvalue": 0
+            },
+            "rrmansory": {
+                "length": 0,
+                "breadth": 0,
+                "depth": 0,
+                "totalvalue": 0
+            },
+            "ssmansory": {
+                "length": 0,
+                "breadth": 0,
+                "depth": 0,
+                "totalvalue": 0
+            },
+            "dpc": {
+                "length": 0,
+                "breadth": 0,
+                "depth": 0,
+                "totalvalue": 0
+            }
+        }
+
+    }
+}
